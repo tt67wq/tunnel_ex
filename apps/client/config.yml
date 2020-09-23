@@ -1,0 +1,13 @@
+
+# client
+client:
+  host: 192.168.10.220
+
+# server
+server:
+  host: 192.168.10.101
+  port: 80
+
+# log
+logger:
+  level: info

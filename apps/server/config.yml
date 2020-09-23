@@ -1,0 +1,13 @@
+# server cfg
+server:
+  port: 22000
+
+# 转发配置
+nat:
+  - name: "server0"
+    from: localhost:8080
+    to: 192.168.10.101:80
+
+  # - name: "server1"
+  #   from: localhost:82
+  #   to: 192.168.10.101:80
