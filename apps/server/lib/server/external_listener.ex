@@ -12,6 +12,13 @@ defmodule Server.ExternalListener do
     GenServer.start_link(__MODULE__, opts, name: name)
   end
 
+  @doc """
+  nat 示例
+  %{
+    "from"=> "localhost:8080"
+    "to"=> "192.168.10.101:80"
+  }
+  """
   def init(nat: nat) do
     [_, port_str] = nat |> Map.get("from") |> String.split(":")
     port = String.to_integer(port_str)
@@ -29,11 +36,11 @@ defmodule Server.ExternalListener do
 
     sock_key = Utils.generete_socket_key()
 
-    # 创建一个worker
+    # 创建一个worker 来处理外部数据
     {:ok, pid} = GenServer.start_link(ExternalWorker, socket: sock, nat: state.nat, key: sock_key)
     :gen_tcp.controlling_process(sock, pid)
 
-    # 注册
+    # 注册至 key => socket 仓库
     SocketStore.add_socket(sock_key, pid)
 
     send(self(), :accept)

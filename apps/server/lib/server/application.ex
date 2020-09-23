@@ -33,6 +33,7 @@ defmodule Server.Application do
     Supervisor.start_link(children ++ get_external_listeners(), opts)
   end
 
+  # 外部监听实例
   defp get_external_listeners() do
     :server
     |> Application.get_env(:nat)

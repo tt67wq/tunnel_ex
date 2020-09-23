@@ -5,7 +5,8 @@ defmodule Server.ExternalWorker do
 
   use GenServer
   require Logger
-  alias Server.{InternalWorker, SocketStore, IPSocketStore}
+  alias Server.{InternalWorker, SocketStore, IPSocketStore, Typespec}
+
 
   def start_link(opts) do
     {name, opts} = Keyword.pop(opts, :name, __MODULE__)
@@ -14,6 +15,7 @@ defmodule Server.ExternalWorker do
 
   def send_message(pid, message), do: GenServer.cast(pid, {:message, message})
 
+  @spec init(socket: Typespec.socket(), nat: map(), key: Typespec.sock_key()) :: {:ok, pid()}
   def init(socket: socket, nat: nat, key: key) do
     [client_ip_raw, client_port] =
       nat
