@@ -7,7 +7,6 @@ defmodule Server.ExternalWorker do
   require Logger
   alias Server.{InternalWorker, SocketStore, IPSocketStore, Typespec}
 
-
   def start_link(opts) do
     {name, opts} = Keyword.pop(opts, :name, __MODULE__)
     GenServer.start_link(__MODULE__, opts, name: name)
@@ -25,6 +24,7 @@ defmodule Server.ExternalWorker do
     {:ok, {ip0, ip1, ip2, ip3}} = client_ip_raw |> to_charlist() |> :inet.parse_address()
 
     Process.send_after(self(), :reset_active, 1000)
+    Process.send_after(self(), :tcp_connection_req, 500)
 
     {:ok,
      %{
@@ -42,8 +42,27 @@ defmodule Server.ExternalWorker do
     {:noreply, state}
   end
 
+  def handle_info(:tcp_connection_req, state) do
+    Logger.info("send tcp connecntion request")
+
+    case IPSocketStore.get_socket(state.client_ip) do
+      nil ->
+        Logger.warn("no socket for ip #{state.client_ip_raw}")
+
+      pid ->
+        InternalWorker.send_message(pid, <<state.key::16, state.client_port::16, 0x05, 0x01>>)
+    end
+
+    {:noreply, state}
+  end
+
   def handle_info({:tcp_closed, _}, state), do: {:stop, :normal, state}
   def handle_info({:tcp_error, _}, state), do: {:stop, :normal, state}
+
+  # def handle_info({:tcp, _, <<_key::16, _client_port::16, 0x05, 0x01>>}, state) do
+  #   Logger.info("tcp connection established")
+  #   {:noreply, state}
+  # end
 
   def handle_info({:tcp, _, data}, state) do
     Logger.info("external recv => #{inspect(data)}")

@@ -68,6 +68,14 @@ defmodule Client.Selector do
     {:noreply, state}
   end
 
+  # 只建立连接
+  def handle_info({:tcp, _socket, <<key::16, client_port::16, 0x05, 0x01>>}, state) do
+    Logger.debug("selector recv tcp connection request")
+    upsert_local_socket(key, client_port)
+    # Worker.send_message(pid, <<0x05, 0x02>>)
+    {:noreply, state}
+  end
+
   def handle_info({:tcp, _socket, data}, state) do
     Logger.debug("selector recv => #{inspect(data)}")
     <<key::16, client_port::16, real_data::binary>> = data
