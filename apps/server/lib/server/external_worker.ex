@@ -24,7 +24,7 @@ defmodule Server.ExternalWorker do
     {:ok, {ip0, ip1, ip2, ip3}} = client_ip_raw |> to_charlist() |> :inet.parse_address()
 
     Process.send_after(self(), :reset_active, 1000)
-    Process.send_after(self(), :tcp_connection_req, 500)
+    Process.send_after(self(), :tcp_connection_req, 50)
 
     {:ok,
      %{
