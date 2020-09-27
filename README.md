@@ -49,7 +49,7 @@ nat:
 ### TODOLIST
 
 - [x] 协议整理
-- [ ] 链接关闭事件
+- [x] 链接关闭事件
 - [ ] UDP支持
 - [ ] Server动态配置
 - [ ] Server Web
