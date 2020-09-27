@@ -9,7 +9,7 @@
 
 ### 配置文件示例
 
-- client 位于 /etc/tunnel_ex/client_config.yml
+- client 位于 ~/.config/tunnel_ex/client_config.yml
 
 ```
 
@@ -27,7 +27,7 @@ logger:
   level: info
 ```
 
-- server 位于 /etc/tunnel_ex/server_config.yml
+- server 位于 ~/.config/tunnel_ex/server_config.yml
 
 ```
 # server cfg
