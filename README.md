@@ -62,12 +62,12 @@ nat:
 
 ### 安装 & 执行
 
-#### RELEASE
+##### 1. RELEASE
 
 - [client](http://10.50.126.0:8000/tunnel_client_v1.0.zip)
 - [server](http://10.50.126.0:8000/tunnel_server_v1.0.zip)
 
-#### 源码编译安装
+##### 2. 源码编译安装
 依赖
 ```
 Elixir >= 1.9
