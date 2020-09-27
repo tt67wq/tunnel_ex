@@ -75,6 +75,12 @@ defmodule Client.Selector do
     {:noreply, state}
   end
 
+  def handle_info({:tcp, _, <<0x09, 0x04, key::16>>}, state) do
+    Logger.debug("selector recv tcp close request")
+    SocketStore.rm_socket(key)
+    {:noreply, state}
+  end
+
   def handle_info({:tcp, _socket, data}, state) do
     Logger.debug("selector recv => #{inspect(data)}")
     <<key::16, client_port::16, real_data::binary>> = data

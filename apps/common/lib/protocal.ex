@@ -12,7 +12,7 @@ defmodule Common.Protocal do
   以192.168.10.1为例子，上报的packet为 <0x09, 0x01, ip0, ip1, ip2, ip3>
   server接收到这个packet之后，会发送回执
   ```
-  |0x09 | 0x02 |
+  | 0x09 | 0x02 |
   ```
   client收到后表示握手结束。
 
@@ -39,5 +39,12 @@ defmodule Common.Protocal do
   | key::16 | real packet |
   ```
   服务端接收到会根据key来找到对应的外部连接，并吐出真实流量。
+
+  4. 连接关闭
+  当外部连接关闭， server会发送连接关闭的通知，client接到通知后做清理工作，通知的格式如下
+
+  ```
+  | 0x09 | 0x04 | key :: 16 |
+  ```
   """
 end

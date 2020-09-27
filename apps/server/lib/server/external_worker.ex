@@ -45,14 +45,7 @@ defmodule Server.ExternalWorker do
   def handle_info(:tcp_connection_req, state) do
     Logger.info("send tcp connecntion request")
 
-    case IPSocketStore.get_socket(state.client_ip) do
-      nil ->
-        Logger.warn("no socket for ip #{state.client_ip_raw}")
-
-      pid ->
-        InternalWorker.send_message(pid, <<0x09, 0x03, state.key::16, state.client_port::16>>)
-    end
-
+    send_msg(state.client_ip, <<0x09, 0x03, state.key::16, state.client_port::16>>)
     {:noreply, state}
   end
 
@@ -62,17 +55,7 @@ defmodule Server.ExternalWorker do
   def handle_info({:tcp, _, data}, state) do
     Logger.info("external recv => #{inspect(data)}")
 
-    case IPSocketStore.get_socket(state.client_ip) do
-      nil ->
-        Logger.warn("no socket for ip #{state.client_ip_raw}")
-
-      pid ->
-        InternalWorker.send_message(
-          pid,
-          <<state.key::16, state.client_port::16>> <> data
-        )
-    end
-
+    send_msg(state.client_ip, <<state.key::16, state.client_port::16>> <> data)
     {:noreply, state}
   end
 
@@ -91,6 +74,19 @@ defmodule Server.ExternalWorker do
 
   defp cleanup(_reason, state) do
     # Cleanup whatever you need cleaned up
+
+    send_msg(state.client_ip, <<0x09, 0x04, state.key::16>>)
     SocketStore.rm_socket(state.key)
+  end
+
+  defp send_msg(ip, msg) do
+    case IPSocketStore.get_socket(ip) do
+      nil ->
+        Logger.warn("no socket avaiable")
+        {:error, "no socket avaiable"}
+
+      pid ->
+        InternalWorker.send_message(pid, msg)
+    end
   end
 end
