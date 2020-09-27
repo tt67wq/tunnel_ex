@@ -62,14 +62,24 @@ nat:
 
 ### 安装 & 执行
 
-依赖 Elixir > 1.9, erlang > 21.0
+#### RELEASE
+
+- [client](http://10.50.126.0:8000/tunnel_client_v1.0.zip)
+- [server](http://10.50.126.0:8000/tunnel_server_v1.0.zip)
+
+#### 源码编译安装
+依赖
+```
+Elixir >= 1.9
+erlang >= 22.0
+```
 
 - client
 ```
 cd tunnel_ex/app/client
 MIX_ENV=prod mix release --path ${your install_path}
 cd ${your install_path}
-./bin/client
+./bin/client --help
 ```
 
 - server
@@ -77,5 +87,5 @@ cd ${your install_path}
 cd tunnel_ex/app/server
 MIX_ENV=prod mix release --path ${your install_path}
 cd ${your install_path}
-./bin/server
+./bin/server --help
 ```
