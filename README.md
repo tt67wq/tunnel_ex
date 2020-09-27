@@ -50,10 +50,11 @@ nat:
 
 - [x] 协议整理
 - [x] 链接关闭事件
+- [x] Release pkg
 - [ ] UDP支持
 - [ ] Server动态配置
 - [ ] Server Web
-- [ ] Release pkg
+
 
 ### 协议整理
 
