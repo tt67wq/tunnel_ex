@@ -50,7 +50,7 @@ defmodule Server.ExternalWorker do
         Logger.warn("no socket for ip #{state.client_ip_raw}")
 
       pid ->
-        InternalWorker.send_message(pid, <<state.key::16, state.client_port::16, 0x05, 0x01>>)
+        InternalWorker.send_message(pid, <<0x09, 0x03, state.key::16, state.client_port::16>>)
     end
 
     {:noreply, state}
@@ -58,11 +58,6 @@ defmodule Server.ExternalWorker do
 
   def handle_info({:tcp_closed, _}, state), do: {:stop, :normal, state}
   def handle_info({:tcp_error, _}, state), do: {:stop, :normal, state}
-
-  # def handle_info({:tcp, _, <<_key::16, _client_port::16, 0x05, 0x01>>}, state) do
-  #   Logger.info("tcp connection established")
-  #   {:noreply, state}
-  # end
 
   def handle_info({:tcp, _, data}, state) do
     Logger.info("external recv => #{inspect(data)}")

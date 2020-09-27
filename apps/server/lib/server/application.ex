@@ -7,7 +7,11 @@ defmodule Server.Application do
 
   defp load_cfg() do
     cfg =
-      Application.get_env(:server, :cfg_path) |> File.read!() |> YamlElixir.read_from_string!()
+      :server
+      |> Application.get_env(:cfg_path)
+      |> Path.expand()
+      |> File.read!()
+      |> YamlElixir.read_from_string!()
 
     server_cfg = Map.fetch!(cfg, "server")
     nat_cfg = Map.fetch!(cfg, "nat")

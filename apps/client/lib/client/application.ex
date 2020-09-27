@@ -7,11 +7,14 @@ defmodule Client.Application do
 
   defp load_cfg() do
     cfg =
-      Application.get_env(:client, :cfg_path) |> File.read!() |> YamlElixir.read_from_string!()
+      :client
+      |> Application.get_env(:cfg_path)
+      |> Path.expand()
+      |> File.read!()
+      |> YamlElixir.read_from_string!()
 
     client_cfg = Map.get(cfg, "client")
     server_cfg = Map.get(cfg, "server")
-    logger_cfg = Map.get(cfg, "logger")
 
     Application.put_env(:client, :client_cfg, host: Map.get(client_cfg, "host"))
 
@@ -19,8 +22,6 @@ defmodule Client.Application do
       host: Map.get(server_cfg, "host"),
       port: Map.get(server_cfg, "port")
     )
-
-    Application.put_env(:logger, :level, String.to_atom(Map.get(logger_cfg, "level")))
   end
 
   def start(_type, _args) do

@@ -31,7 +31,7 @@ defmodule Server.InternalWorker do
     Logger.info("internal recv => #{inspect(data)}")
     IPSocketStore.add_socket(<<ip::32>>, self())
     # handshake
-    :gen_tcp.send(socket, <<0x09, 0x02, 0x00, 0x01>>)
+    :gen_tcp.send(socket, <<0x09, 0x02>>)
     {:noreply, Map.put(state, :ip, <<ip::32>>)}
   end
 

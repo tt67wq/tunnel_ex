@@ -62,24 +62,23 @@ defmodule Client.Selector do
     {:noreply, state}
   end
 
-  def handle_info({:tcp, _socket, <<0x09, 0x02, 0x00, 0x01>>}, state) do
+  def handle_info({:tcp, _socket, <<0x09, 0x02>>}, state) do
     # handshake finished
     Logger.info("handshake finished")
     {:noreply, state}
   end
 
   # 只建立连接
-  def handle_info({:tcp, _socket, <<key::16, client_port::16, 0x05, 0x01>>}, state) do
+  def handle_info({:tcp, _socket, <<0x09, 0x03, key::16, client_port::16>>}, state) do
     Logger.debug("selector recv tcp connection request")
-    upsert_local_socket(key, client_port)
-    # Worker.send_message(pid, <<0x05, 0x02>>)
+    get_or_create_local_socket(key, client_port)
     {:noreply, state}
   end
 
   def handle_info({:tcp, _socket, data}, state) do
     Logger.debug("selector recv => #{inspect(data)}")
     <<key::16, client_port::16, real_data::binary>> = data
-    {:ok, pid} = upsert_local_socket(key, client_port)
+    {:ok, pid} = get_or_create_local_socket(key, client_port)
 
     Worker.send_message(pid, <<real_data::binary>>)
 
@@ -103,7 +102,7 @@ defmodule Client.Selector do
     {:noreply, state}
   end
 
-  defp upsert_local_socket(key, local_port) do
+  defp get_or_create_local_socket(key, local_port) do
     case SocketStore.get_socket(key) do
       nil ->
         # no existing socket, establish a new one
