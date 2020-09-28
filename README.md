@@ -22,9 +22,6 @@ server:
   host: 192.168.10.101 # remote host
   port: 22000 # remote port
 
-# log
-logger:
-  level: info
 ```
 
 - server 位于 ~/.config/tunnel_ex/server_config.yml
@@ -40,9 +37,9 @@ nat:
     from: localhost:8080 # outside port
     to: 192.168.10.101:80 # inside port
 
-  # - name: "server1"
-  #   from: localhost:82
-  #   to: 192.168.10.101:80
+  - name: "server1"
+    from: localhost:8081
+    to: 192.168.10.101:81
 
 ```
 
@@ -51,8 +48,9 @@ nat:
 - [x] 协议整理
 - [x] 链接关闭事件
 - [x] Release pkg
+- [x] 用连接池提升效率
 - [ ] UDP支持
-- [ ] Server动态配置
+- [ ] Server动态配置，穿透配置持久化
 - [ ] Server Web
 
 

@@ -33,13 +33,23 @@ defmodule Client.Application do
     children = [
       # Starts a worker by calling: Client.Worker.start_link(arg)
       # {Client.Worker, arg}
-      Client.SocketStore,
-      Client.Selector
+      Client.SocketStore
+      # Client.Selector
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Client.Supervisor]
-    Supervisor.start_link(children, opts)
+    Supervisor.start_link(children ++ selector_pool(), opts)
+  end
+
+  # 连接池
+  defp selector_pool() do
+    poolsize = Application.get_env(:client, :poolsize, 5)
+
+    1..poolsize
+    |> Enum.map(fn x ->
+      Supervisor.child_spec({Client.Selector, name: :"selector#{x}"}, id: :"selector#{x}")
+    end)
   end
 end
