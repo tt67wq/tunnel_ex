@@ -65,7 +65,7 @@ nat:
 
 ### 安装 & 执行
 
-##### 1. RELEASE
+##### 1. RELEASE(目前只有Linux_x64的版本，其他平台的需要自己编译)
 
 - [client](http://10.50.126.0:8000/tunnel_client_v1.1.zip)
 - [server](http://10.50.126.0:8000/tunnel_server_v1.1.zip)
