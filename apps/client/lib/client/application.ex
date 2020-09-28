@@ -15,6 +15,7 @@ defmodule Client.Application do
 
     client_cfg = Map.get(cfg, "client")
     server_cfg = Map.get(cfg, "server")
+    pool_cfg = Map.get(cfg, "pool", %{"size" => 5})
 
     Application.put_env(:client, :client_cfg, host: Map.get(client_cfg, "host"))
 
@@ -22,6 +23,8 @@ defmodule Client.Application do
       host: Map.get(server_cfg, "host"),
       port: Map.get(server_cfg, "port")
     )
+
+    Application.put_env(:client, :poolsize, Map.get(pool_cfg, "size"))
   end
 
   def start(_type, _args) do

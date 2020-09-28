@@ -22,6 +22,10 @@ server:
   host: 192.168.10.101 # remote host
   port: 22000 # remote port
 
+# pool
+pool:
+  size: 5
+
 ```
 
 - server 位于 ~/.config/tunnel_ex/server_config.yml
