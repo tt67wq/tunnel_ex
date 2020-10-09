@@ -85,9 +85,9 @@ defmodule Client.Selector do
       nil ->
         nil
 
-      sock ->
+      pid ->
         SocketStore.rm_socket(key)
-        :gen_tcp.close(sock)
+        Process.exit(pid, :tcp_closed)
     end
 
     {:noreply, state}
