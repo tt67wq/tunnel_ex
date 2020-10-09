@@ -75,9 +75,21 @@ defmodule Client.Selector do
     {:noreply, state}
   end
 
+  # 断开连接
   def handle_info({:tcp, _, <<0x09, 0x04, key::16>>}, state) do
     Logger.debug("selector recv tcp close request")
-    SocketStore.rm_socket(key)
+
+    # close socket
+    SocketStore.get_socket(key)
+    |> case do
+      nil ->
+        nil
+
+      sock ->
+        SocketStore.rm_socket(key)
+        :gen_tcp.close(sock)
+    end
+
     {:noreply, state}
   end
 
