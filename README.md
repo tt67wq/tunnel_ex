@@ -4,7 +4,7 @@
 
 ### 物理架构
 
-![架构图](https://gitlab.jiliguala.com/alex_wan/tunnel_ex/raw/master/media/structure.png)
+![架构图](https://raw.githubusercontent.com/tt67wq/tunnel_ex/master/media/structure.png)
 
 
 ### 配置文件示例
@@ -61,15 +61,15 @@ nat:
 
 ### 协议整理
 
-  [协议内容](https://gitlab.jiliguala.com/alex_wan/tunnel_ex/blob/master/apps/common/lib/protocal.ex)
+  [协议内容](https://github.com/tt67wq/tunnel_ex/blob/master/apps/common/lib/protocal.ex)
 
 
 ### 安装 & 执行
 
 ##### 1. RELEASE(目前只有Linux_x64的版本，其他平台的需要自己编译)
 
-- [client](http://10.50.126.0:8000/tunnel_client_v1.1.zip)
-- [server](http://10.50.126.0:8000/tunnel_server_v1.1.zip)
+- [client](http://47.240.61.212/tunnel_client_v1.1.zip)
+- [server](http://47.240.61.212/tunnel_server_v1.1.zip)
 
 ##### 2. 源码编译安装
 依赖
