@@ -14,7 +14,7 @@ defmodule Client.Worker do
   end
 
   def init(socket: socket, key: key, selector: pid) do
-    Process.send_after(self(), :reset_active, 1000)
+    # Process.send_after(self(), :reset_active, 1000)
     {:ok, %{socket: socket, key: key, selector: pid}}
   end
 
