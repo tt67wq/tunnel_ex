@@ -87,7 +87,7 @@ defmodule Client.Selector do
 
       pid ->
         SocketStore.rm_socket(key)
-        Process.exit(pid, :tcp_closed)
+        send(pid, {:tcp_closed, :normal})
     end
 
     {:noreply, state}
