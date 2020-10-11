@@ -53,7 +53,8 @@ nat:
 - [x] 链接关闭事件
 - [x] Release pkg
 - [x] 用连接池提升效率
-- [x] 日志
+- [ ] 日志path
+- [ ] 连接异常处理
 - [ ] UDP支持
 - [ ] Server动态配置，穿透配置持久化
 - [ ] Server Web
