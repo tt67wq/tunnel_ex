@@ -31,7 +31,7 @@ defmodule Common.Protocal do
 
   当连接都建立完毕，外部流量包在转发时，会带上4字节前缀，格式如下：
   ```
-  | key::16 | client_port::16 | real packet |
+  | key::16 | real packet |
   ```
   与建立连接阶段一致，2字节长度的key用于标识server端的外部连接， 2字节长的client_port表示内网端口。
   client接收到内部回复的流量，在转发时会带上2字节前缀, 格式如下：
