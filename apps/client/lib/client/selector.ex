@@ -71,7 +71,7 @@ defmodule Client.Selector do
   # 只建立连接
   def handle_info({:tcp, _socket, <<0x09, 0x03, key::16, client_port::16>>}, state) do
     Logger.debug("selector recv tcp connection request")
-    get_or_create_local_socket(key, client_port)
+    create_local_conn(key, client_port)
     {:noreply, state}
   end
 
@@ -95,10 +95,17 @@ defmodule Client.Selector do
 
   def handle_info({:tcp, _socket, data}, state) do
     Logger.debug("selector recv => #{inspect(data)}")
-    <<key::16, client_port::16, real_data::binary>> = data
-    {:ok, pid} = get_or_create_local_socket(key, client_port)
+    <<key::16, real_data::binary>> = data
 
-    Worker.send_message(pid, <<real_data::binary>>)
+    key
+    |> SocketStore.get_socket()
+    |> case do
+      nil ->
+        Logger.error("no connection for key #{key}")
+
+      pid ->
+        Worker.send_message(pid, <<real_data::binary>>)
+    end
 
     {:noreply, state}
   end
@@ -120,28 +127,16 @@ defmodule Client.Selector do
     {:noreply, state}
   end
 
-  defp get_or_create_local_socket(key, local_port) do
-    case SocketStore.get_socket(key) do
-      nil ->
-        # no existing socket, establish a new one
-        {:ok, sock} = :gen_tcp.connect('localhost', local_port, [:binary, active: true])
-
-        Logger.info("establish a new connection to localhost:#{local_port}")
-
-        {:ok, pid} =
-          GenServer.start_link(Worker,
-            socket: sock,
-            key: key,
-            selector: self()
-          )
-
-        :gen_tcp.controlling_process(sock, pid)
-        SocketStore.add_socket(key, pid)
-        {:ok, pid}
-
-      pid ->
-        Logger.debug("existing pid #{inspect(pid)}")
-        {:ok, pid}
+  defp create_local_conn(key, port) do
+    with {:ok, sock} <- :gen_tcp.connect('localhost', port, [:binary, active: true]),
+         {:ok, pid} <- GenServer.start_link(Worker, socket: sock, key: key, selector: self()),
+         :ok <- :gen_tcp.controlling_process(sock, pid) do
+      Logger.info("establish a new connection to localhost:#{port}")
+      SocketStore.add_socket(key, pid)
+    else
+      reason ->
+        Logger.info("connect to localhost:#{port} failed => #{inspect(reason)}")
+        :error
     end
   end
 end

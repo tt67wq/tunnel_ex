@@ -55,7 +55,7 @@ defmodule Server.ExternalWorker do
   def handle_info({:tcp, _, data}, state) do
     Logger.info("external recv => #{inspect(data)}")
 
-    send_msg(state.client_ip, <<state.key::16, state.client_port::16>> <> data)
+    send_msg(state.client_ip, <<state.key::16>> <> data)
     {:noreply, state}
   end
 
