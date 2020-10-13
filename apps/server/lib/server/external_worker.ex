@@ -23,15 +23,17 @@ defmodule Server.ExternalWorker do
 
     {:ok, {ip0, ip1, ip2, ip3}} = client_ip_raw |> to_charlist() |> :inet.parse_address()
 
-    Process.send_after(self(), :tcp_connection_req, 50)
+    :inet.setopts(socket, active: false)
+    send(self(), :tcp_connection_req)
 
     {:ok,
      %{
        socket: socket,
        key: key,
        client_ip: <<ip0, ip1, ip2, ip3>>,
-       client_ip_raw: client_ip_raw,
-       client_port: String.to_integer(client_port)
+       client_port: String.to_integer(client_port),
+       status: 0,
+       buffer: :queue.new()
      }}
   end
 
@@ -39,7 +41,22 @@ defmodule Server.ExternalWorker do
     Logger.info("send tcp connecntion request")
 
     send_msg(state.client_ip, <<0x09, 0x03, state.key::16, state.client_port::16>>)
-    {:noreply, state}
+    :inet.setopts(state.socket, active: true)
+    {:noreply, Map.put(state, :status, 1)}
+  end
+
+  def handle_info(:tcp_connection_set, state) do
+    Logger.info("recv tcp connecntion finished")
+
+    # send all buffer to client
+    flush_buffer(state.buffer, state.key, state.client_ip)
+
+    new_state =
+      state
+      |> Map.put(:status, 2)
+      |> Map.put(:buffer, :queue.new())
+
+    {:noreply, new_state}
   end
 
   def handle_info({:tcp_closed, _}, state), do: {:stop, :normal, state}
@@ -48,8 +65,19 @@ defmodule Server.ExternalWorker do
   def handle_info({:tcp, _, data}, state) do
     Logger.info("external recv => #{inspect(data)}")
 
-    send_msg(state.client_ip, <<state.key::16>> <> data)
-    {:noreply, state}
+    new_state =
+      case state.status do
+        2 ->
+          # already set
+          send_msg(state.client_ip, <<state.key::16>> <> data)
+          state
+
+        _ ->
+          # not set, go to buffer
+          Map.put(state, :buffer, :queue.in(data, state.buffer))
+      end
+
+    {:noreply, new_state}
   end
 
   def handle_cast({:message, message}, state) do
@@ -80,6 +108,19 @@ defmodule Server.ExternalWorker do
 
       pid ->
         InternalWorker.send_message(pid, msg)
+    end
+  end
+
+  defp flush_buffer(buffer, key, ip) do
+    buffer
+    |> :queue.out()
+    |> case do
+      {{:value, msg}, buf} ->
+        send_msg(ip, <<key::16>> <> msg)
+        flush_buffer(buf, key, ip)
+
+      {:empty, _} ->
+        nil
     end
   end
 end

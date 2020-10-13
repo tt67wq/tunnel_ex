@@ -61,9 +61,10 @@ defmodule Client.Selector do
   end
 
   # 只建立连接
-  def handle_info({:tcp, _socket, <<0x09, 0x03, key::16, client_port::16>>}, state) do
+  def handle_info({:tcp, socket, <<0x09, 0x03, key::16, client_port::16>>}, state) do
     Logger.debug("selector recv tcp connection request")
     create_local_conn(key, client_port)
+    :gen_tcp.send(socket, <<0x09, 0x03, key::16>>)
     {:noreply, state}
   end
 
