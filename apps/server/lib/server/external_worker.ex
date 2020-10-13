@@ -23,7 +23,6 @@ defmodule Server.ExternalWorker do
 
     {:ok, {ip0, ip1, ip2, ip3}} = client_ip_raw |> to_charlist() |> :inet.parse_address()
 
-    Process.send_after(self(), :reset_active, 1000)
     Process.send_after(self(), :tcp_connection_req, 50)
 
     {:ok,
@@ -34,12 +33,6 @@ defmodule Server.ExternalWorker do
        client_ip_raw: client_ip_raw,
        client_port: String.to_integer(client_port)
      }}
-  end
-
-  def handle_info(:reset_active, state) do
-    :inet.setopts(state.socket, active: 1000)
-    Process.send_after(self(), :reset_active, 1000)
-    {:noreply, state}
   end
 
   def handle_info(:tcp_connection_req, state) do

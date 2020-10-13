@@ -14,14 +14,8 @@ defmodule Server.InternalWorker do
   def send_message(pid, message), do: GenServer.cast(pid, {:message, message})
 
   def init(socket: socket) do
-    Process.send_after(self(), :reset_active, 1000)
+    :inet.setopts(socket, active: true)
     {:ok, %{socket: socket}}
-  end
-
-  def handle_info(:reset_active, state) do
-    :inet.setopts(state.socket, active: 1000)
-    Process.send_after(self(), :reset_active, 1000)
-    {:noreply, state}
   end
 
   def handle_info({:tcp_closed, _}, state), do: {:stop, :normal, state}

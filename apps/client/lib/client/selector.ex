@@ -37,12 +37,11 @@ defmodule Client.Selector do
     Logger.info("Connecting to #{host}:#{port}")
 
     with {:ok, ip} <- host |> to_charlist |> :inet.parse_address(),
-         {:ok, sock} <- :gen_tcp.connect(ip, port, [:binary, active: 1000, packet: 2]),
+         {:ok, sock} <- :gen_tcp.connect(ip, port, [:binary, active: true, packet: 2]),
          localhost <- client_cfg(),
          {:ok, {ip0, ip1, ip2, ip3}} <- localhost |> to_charlist |> :inet.parse_address() do
       # handshake
       :gen_tcp.send(sock, <<0x09, 0x01, ip0, ip1, ip2, ip3>>)
-      Process.send_after(self(), :reset_active, 1000)
       {:noreply, Map.put(state, :socket, sock)}
     else
       {:error, reason} ->
@@ -53,13 +52,6 @@ defmodule Client.Selector do
       _ ->
         {:stop, :normal, state}
     end
-  end
-
-  # 设置流量限额
-  def handle_info(:reset_active, state) do
-    :inet.setopts(state.socket, active: 1000)
-    Process.send_after(self(), :reset_active, 1000)
-    {:noreply, state}
   end
 
   def handle_info({:tcp, _socket, <<0x09, 0x02>>}, state) do
