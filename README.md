@@ -62,15 +62,15 @@ nat:
 
 ### 协议整理
 
-  [协议内容](https://github.com/tt67wq/tunnel_ex/blob/master/apps/common/lib/protocal.ex)
+  [协议内容](https://github.com/tt67wq/tunnel_ex/blob/master/protocal.md)
 
 
 ### 安装 & 执行
 
 ##### 1. RELEASE(目前只有Linux_x64的版本，其他平台的需要自己编译)
 
-- [client](http://47.240.61.212/tunnel_client_v1.1.zip)
-- [server](http://47.240.61.212/tunnel_server_v1.1.zip)
+- [client](http://47.240.61.212/tunnel_client_v1.2.zip)
+- [server](http://47.240.61.212/tunnel_server_v1.2.zip)
 
 ##### 2. 源码编译安装
 依赖
