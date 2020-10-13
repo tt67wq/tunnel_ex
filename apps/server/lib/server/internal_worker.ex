@@ -43,6 +43,20 @@ defmodule Server.InternalWorker do
     {:noreply, state}
   end
 
+  # error, client key missing
+  def handle_info({:tcp, _socket, <<0x08::8, 0x01::8, key::16>>}, state) do
+    case SocketStore.get_socket(key) do
+      nil ->
+        # no socket, error
+        Logger.warn("no external socket")
+
+      pid ->
+        send(pid, {:tcp_error, :key_error})
+    end
+
+    {:noreply, state}
+  end
+
   def handle_info({:tcp, _socket, <<key::16, real_data::binary>> = data}, state) do
     Logger.info("internal recv => #{inspect(data)}")
 

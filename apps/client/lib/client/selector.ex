@@ -86,7 +86,7 @@ defmodule Client.Selector do
     {:noreply, state}
   end
 
-  def handle_info({:tcp, _socket, data}, state) do
+  def handle_info({:tcp, socket, data}, state) do
     Logger.debug("selector recv => #{inspect(data)}")
     <<key::16, real_data::binary>> = data
 
@@ -95,6 +95,7 @@ defmodule Client.Selector do
     |> case do
       nil ->
         Logger.error("no connection for key #{key}")
+        :gen_tcp.send(socket, <<0x08::8, 0x01::8, key::16>>)
 
       pid ->
         Worker.send_message(pid, <<real_data::binary>>)
