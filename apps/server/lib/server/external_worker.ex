@@ -41,8 +41,15 @@ defmodule Server.ExternalWorker do
     Logger.info("send tcp connecntion request")
 
     send_msg(state.client_ip, <<0x09, 0x03, state.key::16, state.client_port::16>>)
-    :inet.setopts(state.socket, active: true)
-    {:noreply, Map.put(state, :status, 1)}
+    |> case do
+      :ok ->
+        :inet.setopts(state.socket, active: true)
+        {:noreply, Map.put(state, :status, 1)}
+
+      _ ->
+        send(self(), {:tcp_closed, :client_miss})
+        {:noreply, state}
+    end
   end
 
   def handle_info(:tcp_connection_set, state) do
@@ -69,7 +76,7 @@ defmodule Server.ExternalWorker do
       case state.status do
         2 ->
           # already set
-          send_msg(state.client_ip, <<state.key::16>> <> data)
+          :ok = send_msg(state.client_ip, <<state.key::16>> <> data)
           state
 
         _ ->
